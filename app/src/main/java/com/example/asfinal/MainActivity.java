@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.asfinal.adapter.MessageAdapter;
+import com.example.asfinal.adapter.UserAdapter;
 import com.example.asfinal.model.Message;
 import com.example.asfinal.model.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -33,8 +34,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements UserAdapter.UserListener {
     private Button btnLogout;
     private FirebaseAuth mAuth;
     private Toolbar toolbar;
@@ -45,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView txtFullName, txtEmail;
     private FloatingActionButton fab;
     private User user;
+    private List<User> userList;
+    private UserAdapter adapter;
     private List<Message> messageList;
 
     @Override
@@ -52,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
+
         toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -81,13 +86,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
             }
         });
-
     }
 
     public void init() {
         mAuth = FirebaseAuth.getInstance();
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("HOME");
+        toolbar.setTitle("Messages");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         drawer = findViewById(R.id.nav_view_main);
@@ -96,7 +100,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         txtEmail = findViewById(R.id.text_email);
         recyclerView = findViewById(R.id.recycler_view_main);
         fab = findViewById(R.id.fab);
-        fab.setOnClickListener(this);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, AddMessageActivity.class));
+            }
+        });
+
+        adapter = new UserAdapter();
+        userList = new ArrayList<>();
     }
 
     @Override
@@ -116,27 +128,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (currentUser == null) {
             return;
         }
-        String uid = currentUser.getUid();
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
-        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        String uidCurrent = currentUser.getUid();
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(uidCurrent);
+        usersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-                if (user != null) {
-                    TextView nameTextView = navigationView.getHeaderView(0).findViewById(R.id.text_name);
-                    nameTextView.setText(user.getFull_name());
-                    TextView emailTextView = navigationView.getHeaderView(0).findViewById(R.id.text_email);
-                    emailTextView.setText(user.getEmail());
-                    // Nếu có hình ảnh, có thể tải ảnh từ URL và hiển thị lên ImageView trong NavigationView Header
-//                    if (user.getPhotoUrl() != null) {
-//                        ImageView avatarImageView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_avatar);
-//                        Glide.with(context).load(user.getPhotoUrl()).into(avatarImageView);
-//                    }
+                userList.clear();
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                    String userUid = userSnapshot.getKey();
+                    DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(userUid);
+                    userRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            User user = snapshot.getValue(User.class);
+                            if (user != null) {
+                                user.setUid(userUid);
+                                userList.add(user);
+                            }
+                            adapter.setList(userList);
+                            LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext(), RecyclerView.VERTICAL, false);
+                            recyclerView.setLayoutManager(manager);
+                            recyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }
@@ -149,11 +175,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     @Override
-    public void onClick(View view) {
-        if (view == fab) {
-            startActivity(new Intent(MainActivity.this, AddMessageActivity.class));
-        }
+    public void onClickItem(View view, int position) {
+        Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+        intent.putExtra("user", userList.get(position));
+//        Toast.makeText(this, "ChatActivity" + userList.get(position).getFull_name(), Toast.LENGTH_SHORT).show();
+        startActivity(intent);
     }
 }

@@ -1,21 +1,23 @@
 package com.example.asfinal.model;
 
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class Message {
     private String senderId;
-    private String receiverId;
+    //    private String receiverId;
     private String content;
-    private String timestamp;
+    private long timestamp;
 
     // Constructors, getters and setters
 
     public Message() {
     }
-    public Message(String senderId, String receiverId, String content, String timestamp) {
+
+    public Message(String senderId, String content, long timestamp) {
         this.senderId = senderId;
-        this.receiverId = receiverId;
+//        this.receiverId = receiverId;
         this.content = content;
         this.timestamp = timestamp;
     }
@@ -28,14 +30,6 @@ public class Message {
         this.senderId = senderId;
     }
 
-    public String getReceiverId() {
-        return receiverId;
-    }
-
-    public void setReceiverId(String receiverId) {
-        this.receiverId = receiverId;
-    }
-
     public String getContent() {
         return content;
     }
@@ -44,11 +38,11 @@ public class Message {
         this.content = content;
     }
 
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 }

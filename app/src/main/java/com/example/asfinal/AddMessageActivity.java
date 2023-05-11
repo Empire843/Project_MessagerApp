@@ -120,7 +120,6 @@ public class AddMessageActivity extends AppCompatActivity implements UserAdapter
         intent.putExtra("user", userList.get(position));
 //        Toast.makeText(this, "ChatActivity" + userList.get(position).getFull_name(), Toast.LENGTH_SHORT).show();
         startActivity(intent);
-//        finish();
     }
 
     @Override

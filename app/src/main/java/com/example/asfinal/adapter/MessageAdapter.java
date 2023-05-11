@@ -10,10 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.asfinal.R;
 import com.example.asfinal.model.Message;
-import com.example.asfinal.model.User;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -57,18 +54,18 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messageList.get(position);
-//        LocalDateTime time = message.getTimestamp();
+        long time = message.getTimestamp();
         switch (holder.getItemViewType()) {
             case SENT_MESSAGE:
                 SentMessageViewHolder sentHolder = (SentMessageViewHolder) holder;
                 sentHolder.messageText.setText(message.getContent());
-                sentHolder.messageTime.setText(message.getTimestamp());
+//                sentHolder.messageTime.setText(time + "");
 //                sentHolder.messageStatus.setImageResource(message.getStatusIcon());
                 break;
             case RECEIVED_MESSAGE:
                 ReceivedMessageViewHolder receivedHolder = (ReceivedMessageViewHolder) holder;
                 receivedHolder.messageText.setText(message.getContent());
-                receivedHolder.messageTime.setText(message.getTimestamp());
+//                receivedHolder.messageTime.setText(message.getTimestamp());
                 break;
         }
     }
@@ -86,7 +83,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public SentMessageViewHolder(View itemView) {
             super(itemView);
             messageText = itemView.findViewById(R.id.message_text_send);
-            messageTime = itemView.findViewById(R.id.message_time_send);
+//            messageTime = itemView.findViewById(R.id.message_time_send);
 //            messageStatus = itemView.findViewById(R.id.message_status);
         }
     }
@@ -98,7 +95,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public ReceivedMessageViewHolder(View itemView) {
             super(itemView);
             messageText = itemView.findViewById(R.id.message_text_receive);
-            messageTime = itemView.findViewById(R.id.message_time_receive);
+//            messageTime = itemView.findViewById(R.id.message_time_receive);
         }
     }
 }

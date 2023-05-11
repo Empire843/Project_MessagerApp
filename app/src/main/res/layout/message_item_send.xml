@@ -6,31 +6,28 @@
     android:padding="8dp">
 
     <!--    <ImageView-->
-    <!--        android:id="@+id/profile_image"-->
-    <!--        android:layout_width="48dp"-->
-    <!--        android:layout_height="48dp"-->
-    <!--        android:src="@drawable/ic_user" />-->
+    <!--        android:id="@+id/message_status"-->
+    <!--        android:layout_width="24dp"-->
+    <!--        android:layout_height="24dp"-->
+    <!--        android:src="@drawable/ic_check" />-->
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_image"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/ic_user" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="8dp"
         android:layout_weight="1"
+        android:gravity="end"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/message_text_send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hello, how are you?"
-            android:textColor="@color/black"
+            android:text="Hello, how are you?dddddddddddddddddddđeeeeeeeeeeeeeeetttt"
+            android:textColor="@color/white"
+            android:background="@drawable/text_box_message"
             android:textSize="16sp" />
 
         <TextView
@@ -43,10 +40,9 @@
 
     </LinearLayout>
 
-<!--    <ImageView-->
-<!--        android:id="@+id/message_status"-->
-<!--        android:layout_width="24dp"-->
-<!--        android:layout_height="24dp"-->
-<!--        android:src="@drawable/ic_check" />-->
-
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_user" />
 </LinearLayout>

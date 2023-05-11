@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#ECEFF1" /> <!-- Màu nền của textbox_message -->
+    <corners android:radius="8dp" /> <!-- Bo góc của textbox_message -->
+    <padding
+        android:left="12dp"
+        android:top="8dp"
+        android:right="12dp"
+        android:bottom="8dp" /> <!-- Padding của textbox_message -->
+</shape>

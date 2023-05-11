@@ -18,8 +18,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.asfinal.adapter.ConversationAdapter;
 import com.example.asfinal.adapter.MessageAdapter;
-import com.example.asfinal.adapter.UserAdapter;
 import com.example.asfinal.model.Message;
 import com.example.asfinal.model.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -36,19 +36,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements UserAdapter.UserListener {
-    private Button btnLogout;
+public class MainActivity extends AppCompatActivity implements ConversationAdapter.ConversationListener {
     private FirebaseAuth mAuth;
     private Toolbar toolbar;
     private NavigationView navigationView;
     private DrawerLayout drawer;
     private RecyclerView recyclerView;
     private ActionBarDrawerToggle toggle;
-    private TextView txtFullName, txtEmail;
     private FloatingActionButton fab;
     private User user;
     private List<User> userList;
-    private UserAdapter adapter;
+    private ConversationAdapter adapter;
     private List<Message> messageList;
 
     @Override
@@ -61,17 +59,23 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.UserL
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView = findViewById(R.id.nav_view);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, AddMessageActivity.class));
+            }
+        });
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_item_chat:
-                        Intent intent_chat = new Intent(MainActivity.this, ChatActivity.class);
-                        startActivity(intent_chat);
+//                        Intent intent_chat = new Intent(MainActivity.this, ChatActivity.class);
+//                        startActivity(intent_chat);
                         break;
                     case R.id.nav_item_profile:
                         Intent intent_profile = new Intent(MainActivity.this, ProfileActivity.class);
-                        startActivity(intent_profile);
+                        startActivity(intent_profile  );
                         break;
                     case R.id.nav_item_setting:
                         Intent intent_setting = new Intent(MainActivity.this, SettingsActivity.class);
@@ -86,29 +90,27 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.UserL
                 return true;
             }
         });
+        getConversationFromFirebase();
+        adapter.setConversationListener(this);
     }
 
     public void init() {
+        adapter = new ConversationAdapter();
+
+
         mAuth = FirebaseAuth.getInstance();
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Messages");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        drawer = findViewById(R.id.nav_view_main);
+
+        drawer = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
-        txtFullName = findViewById(R.id.text_name);
-        txtEmail = findViewById(R.id.text_email);
         recyclerView = findViewById(R.id.recycler_view_main);
         fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, AddMessageActivity.class));
-            }
-        });
-
-        adapter = new UserAdapter();
         userList = new ArrayList<>();
+
+
     }
 
     @Override
@@ -123,7 +125,8 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.UserL
         }
     }
 
-    private void getDataUserFromFirebase() {
+    private void getConversationFromFirebase() {
+
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
             return;
@@ -145,13 +148,18 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.UserL
                                 user.setUid(userUid);
                                 userList.add(user);
                             }
-                            adapter.setList(userList);
+                            Message lastMessage = new Message();
+                            lastMessage.setContent("test");
+                            lastMessage.setSenderId(uidCurrent);
+                            lastMessage.setTimestamp(System.currentTimeMillis());
+
+                            adapter.setList(userList, lastMessage, currentUser.getDisplayName());
                             LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext(), RecyclerView.VERTICAL, false);
                             recyclerView.setLayoutManager(manager);
                             recyclerView.setAdapter(adapter);
                             adapter.notifyDataSetChanged();
-                        }
 
+                        }
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
 
@@ -159,10 +167,39 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.UserL
                     });
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+    }
+
+    private void getDataUserFromFirebase() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            return;
+        }
+        String uid = currentUser.getUid();
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                user = dataSnapshot.getValue(User.class);
+                if (user != null) {
+                    TextView nameTextView = navigationView.getHeaderView(0).findViewById(R.id.text_name);
+                    nameTextView.setText(user.getFull_name());
+                    TextView emailTextView = navigationView.getHeaderView(0).findViewById(R.id.text_email);
+                    emailTextView.setText(user.getEmail());
+                    // Nếu có hình ảnh, có thể tải ảnh từ URL và hiển thị lên ImageView trong NavigationView Header
+//                    if (user.getPhotoUrl() != null) {
+//                        ImageView avatarImageView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_avatar);
+//                        Glide.with(context).load(user.getPhotoUrl()).into(avatarImageView);
+//                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
     }
@@ -174,9 +211,8 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.UserL
         finish();
     }
 
-
     @Override
-    public void onClickItem(View view, int position) {
+    public void onClickConversation(View view, int position) {
         Intent intent = new Intent(MainActivity.this, ChatActivity.class);
         intent.putExtra("user", userList.get(position));
 //        Toast.makeText(this, "ChatActivity" + userList.get(position).getFull_name(), Toast.LENGTH_SHORT).show();

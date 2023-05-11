@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <!-- Toolbar layout -->
+        <include layout="@layout/toolbar_save" />
+        <!-- Other views -->
+        <!-- Image view for user avatar -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/edit_user_avatar"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_user" />
+        <!-- Text view for user name -->
+        <EditText
+            android:id="@+id/edit_fullname_profile"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/rounded"
+            android:hint="Full Name"
+            android:inputType="textPersonName"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/edit_phone_profile"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/rounded"
+            android:hint="Phone number"
+            android:inputType="number"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/edit_address_profile"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/rounded"
+            android:hint="Full Name"
+            android:inputType="text"
+            android:textSize="20sp" />
+    </LinearLayout>
+</LinearLayout>
+

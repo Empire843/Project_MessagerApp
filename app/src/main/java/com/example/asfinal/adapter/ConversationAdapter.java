@@ -16,6 +16,8 @@ import com.example.asfinal.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ViewHolder> {
     private List<User> resultList;
     private List<Message> messageList;
@@ -53,6 +55,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         holder.last_sender_name.setText(result.getFull_name() + ":");
         holder.last_content.setText("the last message");
         holder.sender_name_conversation.setText(result.getFull_name());
+//        holder.imageView.setImageResource(R.drawable.ic_baseline_person_24);
     }
 
     @Override
@@ -64,6 +67,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         TextView last_sender_name;
         TextView last_content;
         TextView sender_name_conversation;
+        CircleImageView imageView;
+
 
         //        ImageView imageView;
         public ViewHolder(@NonNull View itemView) {
@@ -71,6 +76,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             last_sender_name = itemView.findViewById(R.id.last_sender_name);
             last_content = itemView.findViewById(R.id.last_content);
             sender_name_conversation = itemView.findViewById(R.id.sender_name_conversation);
+            imageView = itemView.findViewById(R.id.profile_image_conversation);
             itemView.setOnClickListener(this);
 //            imageView = itemView.findViewById(R.id.imageView);
         }

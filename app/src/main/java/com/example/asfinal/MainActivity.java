@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
     private List<User> userList;
     private ConversationAdapter adapter;
     private List<Message> messageList;
+    private ProgressDialog loadingBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                         break;
                     case R.id.nav_item_profile:
                         Intent intent_profile = new Intent(MainActivity.this, ProfileActivity.class);
-                        startActivity(intent_profile  );
+                        startActivity(intent_profile);
                         break;
                     case R.id.nav_item_setting:
                         Intent intent_setting = new Intent(MainActivity.this, SettingsActivity.class);
@@ -90,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                 return true;
             }
         });
+        loadingBar.show();
         getConversationFromFirebase();
         adapter.setConversationListener(this);
     }
@@ -97,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
     public void init() {
         adapter = new ConversationAdapter();
 
-
+        loadingBar = new ProgressDialog(this);
         mAuth = FirebaseAuth.getInstance();
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Messages");
@@ -152,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                             lastMessage.setContent("test");
                             lastMessage.setSenderId(uidCurrent);
                             lastMessage.setTimestamp(System.currentTimeMillis());
-
+                            loadingBar.dismiss();
                             adapter.setList(userList, lastMessage, currentUser.getDisplayName());
                             LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext(), RecyclerView.VERTICAL, false);
                             recyclerView.setLayoutManager(manager);
@@ -172,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
 
             }
         });
-
     }
 
     private void getDataUserFromFirebase() {

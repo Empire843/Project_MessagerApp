@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
         <!-- Toolbar layout -->
-        <include layout="@layout/toolbar_menu_layout" />
+        <include layout="@layout/toolbar_edit" />
         <!-- Other views -->
         <!-- Image view for user avatar -->
         <ImageView

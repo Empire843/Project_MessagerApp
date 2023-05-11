@@ -3,9 +3,13 @@ package com.example.asfinal;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
@@ -28,6 +32,14 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         init();
         setData();
+        ImageView editButton = findViewById(R.id.toolbarEditButton);
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+                startActivity(intent);
+            }
+        });
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -35,7 +47,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
-
     private void setData() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
@@ -72,11 +83,21 @@ public class ProfileActivity extends AppCompatActivity {
         txtEmail = findViewById(R.id.user_email);
         txtPhone = findViewById(R.id.user_phone);
 //        toolbar
-        toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar_edit);
         toolbar.setTitle("Profile");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 //        content
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            // Xử lý khi click vào icon back
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolbar_edit"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/blue_light"
+    android:elevation="4dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Light">
+    <!-- Phần tử cuối bên phải là icon edit -->
+    <ImageView
+        android:id="@+id/toolbarEditButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginRight="8dp"
+        android:contentDescription="Edit"
+        android:padding="8dp"
+        android:src="@drawable/ic_edit" />
+
+</androidx.appcompat.widget.Toolbar>

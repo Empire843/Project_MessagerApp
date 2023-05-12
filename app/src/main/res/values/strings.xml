@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ASFinal</string>
+    <string name="app_name">Messenger</string>
     <string-array name="list_gender">
         <item>Giới tính</item>
         <item>Nam</item>

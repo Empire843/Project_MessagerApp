@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -19,6 +21,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.asfinal.adapter.ConversationAdapter;
 import com.example.asfinal.adapter.MessageAdapter;
 import com.example.asfinal.model.Message;
@@ -36,6 +39,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements ConversationAdapter.ConversationListener {
     private FirebaseAuth mAuth;
@@ -61,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView = findViewById(R.id.nav_view);
+        loadingBar.show();
+        getConversationFromFirebase();
+        adapter.setConversationListener(this);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                         break;
                     case R.id.nav_item_profile:
                         Intent intent_profile = new Intent(MainActivity.this, ProfileActivity.class);
+                        intent_profile.putExtra("user", user);
+                        Toast.makeText(MainActivity.this, user.getEmail(), Toast.LENGTH_SHORT).show();
                         startActivity(intent_profile);
                         break;
                     case R.id.nav_item_setting:
@@ -84,7 +94,24 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                         startActivity(intent_setting);
                         break;
                     case R.id.nav_item_logout:
-                        logout(); // gọi phương thức đăng xuất
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setTitle("Notification!"); // Tiêu đề của thông báo
+                        builder.setMessage("Are you sure you want to sign out of your account?"); // Nội dung của thông báo
+                        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                logout();
+                                dialog.dismiss(); // Đóng thông báo
+                            }
+                        });
+                        builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+
                         break;
                 }
                 menuItem.setChecked(true);
@@ -92,9 +119,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                 return true;
             }
         });
-        loadingBar.show();
-        getConversationFromFirebase();
-        adapter.setConversationListener(this);
+
     }
 
     public void init() {
@@ -112,8 +137,6 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         recyclerView = findViewById(R.id.recycler_view_main);
         fab = findViewById(R.id.fab);
         userList = new ArrayList<>();
-
-
     }
 
     @Override
@@ -163,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                             adapter.notifyDataSetChanged();
 
                         }
+
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
 
@@ -170,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                     });
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -189,17 +214,25 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 user = dataSnapshot.getValue(User.class);
                 if (user != null) {
+                    user.setUid(uid);
+                    Toast.makeText(MainActivity.this, user.getUid() + "", Toast.LENGTH_SHORT).show();
                     TextView nameTextView = navigationView.getHeaderView(0).findViewById(R.id.text_name);
                     nameTextView.setText(user.getFull_name());
                     TextView emailTextView = navigationView.getHeaderView(0).findViewById(R.id.text_email);
                     emailTextView.setText(user.getEmail());
                     // Nếu có hình ảnh, có thể tải ảnh từ URL và hiển thị lên ImageView trong NavigationView Header
-//                    if (user.getPhotoUrl() != null) {
-//                        ImageView avatarImageView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_avatar);
-//                        Glide.with(context).load(user.getPhotoUrl()).into(avatarImageView);
-//                    }
+                    if (user.getAvatar() != null) {
+                        CircleImageView profileImageView = findViewById(R.id.image_avatar);
+                        Glide.with(MainActivity.this)
+                                .load(user.getAvatar())
+                                .placeholder(R.drawable.loading_image)
+//                                .error(R.drawable.error) // Ảnh hiển thị khi có lỗi xảy ra trong quá trình tải ảnh
+                                .into(profileImageView);
+                    }
                 }
+
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
@@ -216,8 +249,14 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
     @Override
     public void onClickConversation(View view, int position) {
         Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-        intent.putExtra("user", userList.get(position));
+        intent.putExtra("user2", userList.get(position));
+        intent.putExtra("user1", user);
 //        Toast.makeText(this, "ChatActivity" + userList.get(position).getFull_name(), Toast.LENGTH_SHORT).show();
         startActivity(intent);
+    }
+
+    @Override
+    public void onLongClickConversation(View view, int position) {
+        Toast.makeText(this, "Long click", Toast.LENGTH_SHORT).show();
     }
 }

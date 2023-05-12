@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolbar_options"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/blue_light"
+    android:elevation="4dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Light">
+    <!-- Phần tử cuối bên phải là icon options -->
+    <ImageView
+        android:id="@+id/toolbarSaveButton"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_gravity="end"
+        android:layout_marginRight="8dp"
+        android:contentDescription="Options"
+        android:padding="8dp"
+        android:scaleType="centerCrop"
+        android:onClick="showOptionsMenu"
+        android:src="@drawable/ic_options" />
+
+</androidx.appcompat.widget.Toolbar>

@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.asfinal.R;
 import com.example.asfinal.model.Message;
 import com.example.asfinal.model.User;
@@ -55,7 +56,11 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         holder.last_sender_name.setText(result.getFull_name() + ":");
         holder.last_content.setText("the last message");
         holder.sender_name_conversation.setText(result.getFull_name());
-//        holder.imageView.setImageResource(R.drawable.ic_baseline_person_24);
+        if (result.getAvatar() != null) {
+            Glide.with(holder.itemView.getContext())
+                    .load(result.getAvatar())
+                    .into(holder.imageView);
+        }
     }
 
     @Override
@@ -63,22 +68,21 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         return resultList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView last_sender_name;
         TextView last_content;
         TextView sender_name_conversation;
         CircleImageView imageView;
 
-
-        //        ImageView imageView;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             last_sender_name = itemView.findViewById(R.id.last_sender_name);
             last_content = itemView.findViewById(R.id.last_content);
             sender_name_conversation = itemView.findViewById(R.id.sender_name_conversation);
             imageView = itemView.findViewById(R.id.profile_image_conversation);
+
             itemView.setOnClickListener(this);
-//            imageView = itemView.findViewById(R.id.imageView);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
@@ -87,9 +91,21 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
                 conversationListener.onClickConversation(view, getAdapterPosition());
             }
         }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if (conversationListener != null) {
+                conversationListener.onLongClickConversation(view, getAdapterPosition());
+                return true;
+            }
+            return false;
+        }
     }
 
     public interface ConversationListener {
         void onClickConversation(View view, int position);
+
+        void onLongClickConversation(View view, int position);
     }
+
 }

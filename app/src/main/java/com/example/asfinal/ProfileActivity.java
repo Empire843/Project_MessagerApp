@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
 import com.example.asfinal.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,22 +23,31 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ProfileActivity extends AppCompatActivity {
     private Toolbar toolbar;
-    private TextView txtFullName, txtEmail, txtPhone;
+    private TextView txtFullName, txtEmail, txtPhone, txtAddress;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         init();
-        setData();
+        receiveDataFromIntent();
+
+//        setData();
+        displayInfor();
         ImageView editButton = findViewById(R.id.toolbarEditButton);
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+                intent.putExtra("user", user);
+                Toast.makeText(ProfileActivity.this, user.getFull_name(), Toast.LENGTH_SHORT).show();
                 startActivity(intent);
+                finish();
             }
         });
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -47,41 +57,32 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
-    private void setData() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser == null) {
-            return;
+    private void receiveDataFromIntent() {
+        Intent intent = getIntent();
+        user = (User) intent.getSerializableExtra("user");
+        if(user == null){
+            Toast.makeText(this, "user bị null;", Toast.LENGTH_SHORT).show();
         }
-        String uid = currentUser.getUid();
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
-        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if (user != null) {
-                    txtFullName.setText(user.getFull_name());
-                    txtEmail.setText("Email: " + user.getEmail());
-                    txtPhone.setText("Phone Number: " + user.getPhone_number());
-                    // Nếu có hình ảnh, có thể tải ảnh từ URL và hiển thị lên ImageView trong NavigationView Header
-//                    if (user.getPhotoUrl() != null) {
-//                        ImageView avatarImageView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_avatar);
-//                        Glide.with(context).load(user.getPhotoUrl()).into(avatarImageView);
-//                    }
-                }
-                // Xử lý danh sách người dùng tại đây
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Xử lý lỗi tại đây
-            }
-        });
     }
-
+    private void displayInfor(){
+        txtFullName.setText(user.getFull_name());
+        txtEmail.setText("Email: " + user.getEmail());
+        txtAddress.setText("Address: " + user.getAddress());
+        txtPhone.setText("Phone Number: " + user.getPhone_number());
+        if (user.getAvatar() != null) {
+            CircleImageView profileImageView = findViewById(R.id.user_avatar);
+            Glide.with(ProfileActivity.this)
+                    .load(user.getAvatar())
+                    .placeholder(R.drawable.loading_image)
+//                                .error(R.drawable.error) // Ảnh hiển thị khi có lỗi xảy ra trong quá trình tải ảnh
+                    .into(profileImageView);
+        }
+    }
     public void init() {
         txtFullName = findViewById(R.id.full_name_profile);
         txtEmail = findViewById(R.id.user_email);
         txtPhone = findViewById(R.id.user_phone);
+        txtAddress = findViewById(R.id.user_address);
 //        toolbar
         toolbar = findViewById(R.id.toolbar_edit);
         toolbar.setTitle("Profile");

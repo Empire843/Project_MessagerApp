@@ -14,8 +14,8 @@
         <!-- Image view for user avatar -->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/edit_user_avatar"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp"
             android:src="@drawable/ic_user" />
@@ -23,31 +23,76 @@
         <EditText
             android:id="@+id/edit_fullname_profile"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:layout_margin="16dp"
             android:background="@drawable/rounded"
             android:hint="Full Name"
             android:inputType="textPersonName"
+            android:paddingLeft="20dp"
             android:textSize="20sp" />
 
         <EditText
             android:id="@+id/edit_phone_profile"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:layout_margin="16dp"
             android:background="@drawable/rounded"
             android:hint="Phone number"
             android:inputType="number"
+            android:paddingLeft="20dp"
             android:textSize="20sp" />
 
         <EditText
             android:id="@+id/edit_address_profile"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:layout_margin="16dp"
             android:background="@drawable/rounded"
-            android:hint="Full Name"
+            android:hint="Address"
             android:inputType="text"
+            android:paddingLeft="20dp"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btn_change_password"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/button_accept"
+            android:hint="Change Password"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/old_password"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/rounded"
+            android:hint="Old Password"
+            android:inputType="text"
+            android:paddingLeft="20dp"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/new_password"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/rounded"
+            android:hint="New Password"
+            android:inputType="text"
+            android:paddingLeft="20dp"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/confirm_password"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/rounded"
+            android:hint="Confirm Password"
+            android:inputType="text"
+            android:paddingLeft="20dp"
             android:textSize="20sp" />
     </LinearLayout>
 </LinearLayout>

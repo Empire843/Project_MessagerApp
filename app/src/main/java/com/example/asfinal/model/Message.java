@@ -8,6 +8,7 @@ public class Message {
     private String senderId;
     //    private String receiverId;
     private String content;
+    private String images;
     private long timestamp;
 
     // Constructors, getters and setters
@@ -15,9 +16,9 @@ public class Message {
     public Message() {
     }
 
-    public Message(String senderId, String content, long timestamp) {
+    public Message(String senderId, String content, String images, long timestamp) {
         this.senderId = senderId;
-//        this.receiverId = receiverId;
+        this.images = images;
         this.content = content;
         this.timestamp = timestamp;
     }
@@ -44,6 +45,14 @@ public class Message {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getImages() {
+        return images;
+    }
+
+    public void setImages(String images) {
+        this.images = images;
     }
 }
 

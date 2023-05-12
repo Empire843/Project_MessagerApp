@@ -31,6 +31,7 @@ public class AddMessageActivity extends AppCompatActivity implements UserAdapter
     private SearchView searchView;
     private List<User> userList;
     private UserAdapter adapter;
+    private User userCurrent= new User();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +74,8 @@ public class AddMessageActivity extends AppCompatActivity implements UserAdapter
                                     if(!uidCurrent.equals(uid)){
                                         user.setUid(uid);
                                         userList.add(user);
+                                    }else {
+                                        userCurrent = user;
                                     }
                                 }
                             }
@@ -117,7 +120,8 @@ public class AddMessageActivity extends AppCompatActivity implements UserAdapter
     @Override
     public void onClickItem(View view, int position) {
         Intent intent = new Intent(AddMessageActivity.this, ChatActivity.class);
-        intent.putExtra("user", userList.get(position));
+        intent.putExtra("user2", userList.get(position));
+        intent.putExtra("user1", userCurrent);
 //        Toast.makeText(this, "ChatActivity" + userList.get(position).getFull_name(), Toast.LENGTH_SHORT).show();
         startActivity(intent);
     }

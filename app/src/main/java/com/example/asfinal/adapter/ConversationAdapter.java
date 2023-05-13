@@ -68,6 +68,12 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         return resultList.size();
     }
 
+    public void deleteItem(int position) {
+        messageList.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, getItemCount());
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView last_sender_name;
         TextView last_content;
@@ -100,6 +106,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             }
             return false;
         }
+
     }
 
     public interface ConversationListener {

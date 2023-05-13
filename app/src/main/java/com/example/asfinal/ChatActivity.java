@@ -228,7 +228,7 @@ public class ChatActivity extends AppCompatActivity {
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
 //        String pathString = "images/" + userCurrent.getUid() + "/" + imageUri.getLastPathSegment();
-        StorageReference storageRef = storage.getReference().child("images").child(userCurrent.getUid()).child(imageUri.getLastPathSegment());
+        StorageReference storageRef = storage.getReference().child("chat").child(userCurrent.getUid()).child(imageUri.getLastPathSegment());
 
         UploadTask uploadTask = storageRef.putFile(imageUri);
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -255,21 +255,18 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void saveMessageToDatabase(String imageUrl) {
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(userCurrent.getUid());
+
+        DatabaseReference messagesRef = database.getReference("Messages");
+        String messageId = messagesRef.child(userCurrent.getUid()).child(userReceive.getUid()).push().getKey();
         Map<String, Object> updateInfo = new HashMap<>();
-        if (imageUrl != null) {
-            updateInfo.put("avatar", imageUrl);
-        }
-        userRef.updateChildren(updateInfo, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                if (databaseError == null) {
-                    // Cập nhật thành công
-                } else {
-                    // Xảy ra lỗi khi cập nhật
-                }
-            }
-        });
+
+        Map<String, Object> updateInfo1 = new HashMap<>();
+        updateInfo1.put("images", imageUrl);
+
+//        messagesRef.child(userCurrent.getUid()).child(userReceive.getUid()).child(messageId).setValue(message);
+        messagesRef.child(userCurrent.getUid()).child(userReceive.getUid()).child(messageId).updateChildren(updateInfo);
+//        messagesRef.child(userReceive.getUid()).child(userCurrent.getUid()).child(messageId).setValue(message);
+        messagesRef.child(userReceive.getUid()).child(userCurrent.getUid()).child(messageId).updateChildren(updateInfo);
     }
 
     @Override

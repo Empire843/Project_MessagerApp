@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView = findViewById(R.id.nav_view);
-        loadingBar.show();
+
         getConversationFromFirebase();
         adapter.setConversationListener(this);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                     case R.id.nav_item_profile:
                         Intent intent_profile = new Intent(MainActivity.this, ProfileActivity.class);
                         intent_profile.putExtra("user", user);
-                        Toast.makeText(MainActivity.this, user.getEmail(), Toast.LENGTH_SHORT).show();
                         startActivity(intent_profile);
                         break;
                     case R.id.nav_item_setting:
@@ -152,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
     }
 
     private void getConversationFromFirebase() {
-
+        loadingBar.show();
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
             return;
@@ -178,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                             lastMessage.setContent("test");
                             lastMessage.setSenderId(uidCurrent);
                             lastMessage.setTimestamp(System.currentTimeMillis());
+
                             loadingBar.dismiss();
                             adapter.setList(userList, lastMessage, currentUser.getDisplayName());
                             LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext(), RecyclerView.VERTICAL, false);
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
-
+                            loadingBar.dismiss();
                         }
                     });
                 }
@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+//                loadingBar.dismiss();
             }
         });
     }
@@ -257,6 +257,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
 
     @Override
     public void onLongClickConversation(View view, int position) {
-        Toast.makeText(this, "Long click", Toast.LENGTH_SHORT).show();
+//        adapter.deleteItem(position);
+
     }
 }

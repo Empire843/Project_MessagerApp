@@ -1,21 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <include layout="@layout/toolbar_edit" />
+
+    <FrameLayout
+        android:id="@+id/background_dimmer"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_marginTop="56dp"
+        android:background="@android:color/darker_gray" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
         android:orientation="vertical">
         <!-- Toolbar layout -->
-        <include layout="@layout/toolbar_edit" />
         <!-- Other views -->
         <!-- Image view for user avatar -->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/user_avatar"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp"
             android:src="@drawable/ic_user" />
@@ -25,41 +35,44 @@
             android:id="@+id/full_name_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:gravity="center"
             android:text="Full Name"
-            android:textSize="20sp" />
+            android:textColor="@color/black"
+            android:textSize="26sp"
+            android:textStyle="bold" />
         <!-- Linear layout for user info -->
-        <LinearLayout
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:background="@color/blue_light"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="@color/tab_indicator_color"
+            app:tabIndicatorHeight="2dp"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/tab_selected_text_color"
+            app:tabTextColor="@color/tab_text_color" />
 
-            <!-- User email -->
-            <TextView
-                android:id="@+id/user_email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Email: user@example.com" />
-
-            <!-- User address -->
-            <TextView
-                android:id="@+id/user_address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Address: 123 Main St." />
-
-            <!-- User phone number -->
-            <TextView
-                android:id="@+id/user_phone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Phone: (123) 456-7890" />
-
-            <!-- More user info... -->
-
-        </LinearLayout>
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </LinearLayout>
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/user_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/user_phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/user_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</RelativeLayout>

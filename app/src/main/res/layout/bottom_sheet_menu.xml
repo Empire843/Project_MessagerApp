@@ -1,0 +1,52 @@
+<!-- menu_bottom_sheet.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_user" />
+
+        <Button
+            android:id="@+id/btn_profile_user"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:background="@color/cardview_light_background"
+            android:gravity="start|center_vertical"
+            android:paddingLeft="15dp"
+            android:text="Profile" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_delete" />
+
+        <Button
+            android:id="@+id/btn_delete_conversation"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:background="@color/cardview_light_background"
+            android:gravity="start|center_vertical"
+            android:paddingLeft="15dp"
+            android:text="Delete"
+            android:textColor="#FF0000" />
+
+    </LinearLayout>
+    <!-- Thêm các thành phần giao diện người dùng khác tùy ý -->
+</LinearLayout>

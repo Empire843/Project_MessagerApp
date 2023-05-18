@@ -5,8 +5,26 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <include layout="@layout/toolbar_edit" />
+<!--    <include layout="@layout/toolbar_edit" />-->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_edit"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/blue_light"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Light">
+        <!-- Phần tử cuối bên phải là icon edit -->
+        <ImageView
+            android:id="@+id/toolbarEditButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginRight="8dp"
+            android:contentDescription="Edit"
+            android:padding="8dp"
+            android:src="@drawable/ic_edit" />
 
+    </androidx.appcompat.widget.Toolbar>
     <FrameLayout
         android:id="@+id/background_dimmer"
         android:layout_width="match_parent"
@@ -47,13 +65,13 @@
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/blue_light"
+            android:background="@color/white"
             app:tabGravity="fill"
-            app:tabIndicatorColor="@color/tab_indicator_color"
+            app:tabIndicatorColor="@color/black"
             app:tabIndicatorHeight="2dp"
             app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/tab_selected_text_color"
-            app:tabTextColor="@color/tab_text_color" />
+            app:tabSelectedTextColor="@color/blue"
+            app:tabTextColor="@color/black" />
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/view_pager"

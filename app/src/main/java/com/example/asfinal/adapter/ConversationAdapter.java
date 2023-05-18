@@ -68,10 +68,16 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         return resultList.size();
     }
 
-    public void deleteItem(int position) {
-        messageList.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, getItemCount());
+//    public void deleteItem(int position) {
+//        messageList.remove(position);
+//        notifyItemRemoved(position);
+//        notifyItemRangeChanged(position, getItemCount());
+//    }
+
+    public void updateData(List<Message> newData) {
+        messageList.clear();
+        messageList.addAll(newData);
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {

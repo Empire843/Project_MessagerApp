@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class User implements Serializable {
     private String uid;
     private String full_name;
+    private String gender;
     private String phone_number;
     private String email;
     private String password;
@@ -14,9 +15,10 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(String uid, String full_name, String phone_number, String email, String password) {
+    public User(String uid, String full_name, String gender, String phone_number, String email, String password) {
         this.uid = uid;
         this.full_name = full_name;
+        this.gender = gender;
         this.phone_number = phone_number;
         this.email = email;
         this.password = password;
@@ -28,6 +30,7 @@ public class User implements Serializable {
         this.email = email;
         this.password = password;
     }
+
 
     public String getUid() {
         return uid;
@@ -43,6 +46,14 @@ public class User implements Serializable {
 
     public void setFull_name(String full_name) {
         this.full_name = full_name;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getPhone_number() {
@@ -84,4 +95,6 @@ public class User implements Serializable {
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
+
+
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--    <item android:id="@+id/menu_conversation_long_click_copy"-->
+    <!--        android:title="@string/copy"-->
+    <!--        android:icon="@drawable/ic_launcher_background"-->
+    <!--        android:iconTint="@color/colorPrimary"-->
+    <!--        android:enabled="true"-->
+    <!--        android:visible="true"-->
+    <!--        android:checkable="false"-->
+    <!--        android:orderInCategory="1"-->
+    <!--        android:showAsAction="never" />-->
+    <item
+        android:id="@+id/menu_conversation_long_click_delete"
+        android:checkable="false"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_background"
+        android:iconTint="@color/colorAccent"
+        android:orderInCategory="2"
+        android:title="@string/delete"
+        android:visible="true"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_conversation_long_click_copy"
+        android:checkable="false"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_background"
+        android:iconTint="@color/colorAccent"
+        android:orderInCategory="2"
+        android:title="@string/delete"
+        android:visible="true"
+        app:showAsAction="never" />
+</menu>

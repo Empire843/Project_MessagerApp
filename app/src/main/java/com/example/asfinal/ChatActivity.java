@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,7 +48,7 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements MessageAdapter.MessageListener {
     private final int REQUEST_IMAGE_PICK = 1;
     private CircleImageView avatar;
     private RecyclerView recyclerView;
@@ -64,6 +65,7 @@ public class ChatActivity extends AppCompatActivity {
     private String uidReceive;
     private FirebaseDatabase database;
     private ProgressDialog loadingBar;
+    private MessageAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +93,7 @@ public class ChatActivity extends AppCompatActivity {
         btnSelectImages.setOnClickListener(view -> {
             chooseImage();
         });
+        adapter.setMessageListener(this);
 //        showMessage();
     }
 
@@ -122,6 +125,8 @@ public class ChatActivity extends AppCompatActivity {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         uidCurrent = mAuth.getCurrentUser().getUid();
         database = FirebaseDatabase.getInstance();
+
+        adapter = new MessageAdapter();
 
     }
 
@@ -197,7 +202,8 @@ public class ChatActivity extends AppCompatActivity {
                     messageList.add(message);
                     textList.add(message.getContent());
                 }
-                MessageAdapter adapter = new MessageAdapter(messageList, uidCurrent, userCurrent.getAvatar(), userReceive.getAvatar());
+//                MessageAdapter adapter = new MessageAdapter(messageList, uidCurrent, userCurrent.getAvatar(), userReceive.getAvatar());
+                adapter.setMessageList(messageList, uidCurrent, userCurrent.getAvatar(), userReceive.getAvatar());
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(ChatActivity.this));
                 recyclerView.scrollToPosition(messageList.size() - 1);
@@ -212,6 +218,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
+
     }
 
     private void chooseImage() {
@@ -227,6 +234,7 @@ public class ChatActivity extends AppCompatActivity {
         alertDialog.show();
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
+        long times = System.currentTimeMillis();
 //        String pathString = "images/" + userCurrent.getUid() + "/" + imageUri.getLastPathSegment();
         StorageReference storageRef = storage.getReference().child("chat").child(userCurrent.getUid()).child(imageUri.getLastPathSegment());
 
@@ -269,6 +277,22 @@ public class ChatActivity extends AppCompatActivity {
         messagesRef.child(userReceive.getUid()).child(userCurrent.getUid()).child(messageId).updateChildren(updateInfo);
     }
 
+    private void showAlertDialogMenu() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Menu");
+        String[] menuItems = {"Delete", "Copy"}; // Các mục trong menu
+        builder.setItems(menuItems, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Xử lý khi mục trong menu được chọn
+                String selectedItem = menuItems[which];
+                Toast.makeText(getApplicationContext(), "Selected: " + selectedItem, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.show(); // Hiển thị dialog menu
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -278,5 +302,17 @@ public class ChatActivity extends AppCompatActivity {
 
             uploadImageToStorage(imageUri);
         }
+    }
+
+    @Override
+    public void onClickMessage(View view, int position) {
+//        Toast.makeText(this, "Click Short", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onLongClickMessage(View view, int position) {
+        Toast.makeText(this, "Click Long", Toast.LENGTH_SHORT).show();
+        showAlertDialogMenu();
+
     }
 }

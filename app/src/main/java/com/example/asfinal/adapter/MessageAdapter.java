@@ -30,17 +30,28 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<Message> messageList;
     private String uidCurrent;
 
-    public MessageAdapter(List<Message> messageList, String uidCurrent, String imageUrl_sender, String imageUrl_receiver) {
-        this.messageList = messageList;
-        this.uidCurrent = uidCurrent;
-        this.imageUrl_sender = imageUrl_sender;
-        this.imageUrl_receiver = imageUrl_receiver;
+    private MessageListener messageListener;
+
+    public void setMessageListener(MessageAdapter.MessageListener messageListener) {
+        this.messageListener = messageListener;
+        notifyDataSetChanged();
+    }
+
+    public MessageAdapter() {
         notifyDataSetChanged();
     }
 
     public MessageAdapter(List<Message> messageList, String uidCurrent) {
         this.messageList = messageList;
         this.uidCurrent = uidCurrent;
+        notifyDataSetChanged();
+    }
+
+    public void setMessageList(List<Message> messageList, String uidCurrent, String imageUrl_sender, String imageUrl_receiver) {
+        this.messageList = messageList;
+        this.uidCurrent = uidCurrent;
+        this.imageUrl_sender = imageUrl_sender;
+        this.imageUrl_receiver = imageUrl_receiver;
         notifyDataSetChanged();
     }
 
@@ -90,7 +101,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             .load(imageUrlSender)
                             .placeholder(R.drawable.ic_user)
                             .into(sentHolder.messageImage);
-                }else{
+                } else {
                     sentHolder.messageImage.setVisibility(View.GONE);
                 }
                 Glide.with(sentHolder.imageView_sender.getContext())
@@ -111,7 +122,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             .load(imageUrlReceiver)
                             .placeholder(R.drawable.ic_user)
                             .into(receivedHolder.messageImage);
-                }else{
+                } else {
                     receivedHolder.messageImage.setVisibility(View.GONE);
                 }
 
@@ -129,13 +140,12 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return messageList.size();
     }
 
-    public class SentMessageViewHolder extends RecyclerView.ViewHolder {
+    public class SentMessageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView messageText;
         TextView messageTime;
         ImageView messageImage;
         CircleImageView imageView_sender;
 
-        //        ImageView messageStatus;
         public SentMessageViewHolder(View itemView) {
             super(itemView);
             messageText = itemView.findViewById(R.id.message_text_send);
@@ -143,10 +153,28 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             messageTime = itemView.findViewById(R.id.message_time_send);
             messageImage = itemView.findViewById(R.id.message_image_send);
 //            messageStatus = itemView.findViewById(R.id.message_status);
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (messageListener != null) {
+                messageListener.onClickMessage(view, getAdapterPosition());
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if (messageListener != null) {
+                messageListener.onLongClickMessage(view, getAdapterPosition());
+                return true;
+            }
+            return false;
         }
     }
 
-    public class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
+    public class ReceivedMessageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView messageText;
         TextView messageTime;
         ImageView messageImage;
@@ -158,6 +186,31 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             imageView_receiver = itemView.findViewById(R.id.profile_image_receiver);
             messageTime = itemView.findViewById(R.id.message_time_receive);
             messageImage = itemView.findViewById(R.id.message_image_receive);
+
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
+
+        @Override
+        public void onClick(View view) {
+            if (messageListener != null) {
+                messageListener.onClickMessage(view, getAdapterPosition());
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if (messageListener != null) {
+                messageListener.onLongClickMessage(view, getAdapterPosition());
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public interface MessageListener {
+        void onClickMessage(View view, int position);
+
+        void onLongClickMessage(View view, int position);
     }
 }

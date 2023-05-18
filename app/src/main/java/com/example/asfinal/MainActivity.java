@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +27,10 @@ import com.example.asfinal.adapter.ConversationAdapter;
 import com.example.asfinal.adapter.MessageAdapter;
 import com.example.asfinal.model.Message;
 import com.example.asfinal.model.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
     private ConversationAdapter adapter;
     private List<Message> messageList;
     private ProgressDialog loadingBar;
+    private BottomSheetBehavior bottomSheetBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +78,9 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, AddMessageActivity.class));
+                Intent intent = new Intent(MainActivity.this, AddMessageActivity.class);
+                intent.putExtra("userCurrent", user);
+                startActivity(intent);
             }
         });
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -94,8 +102,8 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                         break;
                     case R.id.nav_item_logout:
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setTitle("Notification!"); // Tiêu đề của thông báo
-                        builder.setMessage("Are you sure you want to sign out of your account?"); // Nội dung của thông báo
+                        builder.setTitle("Notification!");
+                        builder.setMessage("Are you sure you want to sign out of your account?");
                         builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -118,7 +126,6 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                 return true;
             }
         });
-
     }
 
     public void init() {
@@ -141,8 +148,8 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) {
+        FirebaseUser user1 = mAuth.getCurrentUser();
+        if (user1 == null) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
         } else {
@@ -162,16 +169,23 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 userList.clear();
+                if (!dataSnapshot.exists()) {
+                    // Không có cuộc hội thoại nào
+                    loadingBar.dismiss();
+                    adapter.setList(userList, null, currentUser.getDisplayName());
+                    adapter.notifyDataSetChanged();
+                    return;
+                }
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                     String userUid = userSnapshot.getKey();
                     DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(userUid);
                     userRef.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            User user = snapshot.getValue(User.class);
-                            if (user != null) {
-                                user.setUid(userUid);
-                                userList.add(user);
+                            User userSnap = snapshot.getValue(User.class);
+                            if (userSnap != null) {
+                                userSnap.setUid(userUid);
+                                userList.add(userSnap);
                             }
                             Message lastMessage = new Message();
                             lastMessage.setContent("test");
@@ -186,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                             adapter.notifyDataSetChanged();
 
                         }
-
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
                             loadingBar.dismiss();
@@ -197,9 +210,15 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-//                loadingBar.dismiss();
+                loadingBar.dismiss();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getDataUserFromFirebase();
     }
 
     private void getDataUserFromFirebase() {
@@ -215,7 +234,6 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                 user = dataSnapshot.getValue(User.class);
                 if (user != null) {
                     user.setUid(uid);
-                    Toast.makeText(MainActivity.this, user.getUid() + "", Toast.LENGTH_SHORT).show();
                     TextView nameTextView = navigationView.getHeaderView(0).findViewById(R.id.text_name);
                     nameTextView.setText(user.getFull_name());
                     TextView emailTextView = navigationView.getHeaderView(0).findViewById(R.id.text_email);
@@ -251,13 +269,51 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         Intent intent = new Intent(MainActivity.this, ChatActivity.class);
         intent.putExtra("user2", userList.get(position));
         intent.putExtra("user1", user);
-//        Toast.makeText(this, "ChatActivity" + userList.get(position).getFull_name(), Toast.LENGTH_SHORT).show();
         startActivity(intent);
     }
 
     @Override
     public void onLongClickConversation(View view, int position) {
-//        adapter.deleteItem(position);
+        showBottomSheetMenu(view, position);
+    }
 
+    public void showBottomSheetMenu(View view, int position) {
+        View bottomSheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_menu, null);
+
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(bottomSheetView);
+
+        bottomSheetBehavior = BottomSheetBehavior.from((View) bottomSheetView.getParent());
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        Button btnDelete = bottomSheetView.findViewById(R.id.btn_delete_conversation);
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                deleteConversation(view, position);
+                bottomSheetDialog.dismiss();
+            }
+        });
+        bottomSheetDialog.show();
+    }
+
+    private void deleteConversation(View view, int position) {
+        User conversationDelete = userList.get(position);
+        Toast.makeText(this, conversationDelete.getFull_name(), Toast.LENGTH_SHORT).show();
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("Messages");
+//        String messageId = databaseRef.child(user.getUid()).child(conversationDelete.getUid()).push().getKey();
+//        DatabaseReference nodeRef = databaseRef.child(user.getUid()).child(conversationDelete.getUid()).child(messageId);
+        DatabaseReference nodeRef = databaseRef.child(user.getUid()).child(conversationDelete.getUid());
+        nodeRef.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+//                    adapter.deleteItem(position);
+                } else {
+                    Toast.makeText(MainActivity.this, "Delete Failed!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

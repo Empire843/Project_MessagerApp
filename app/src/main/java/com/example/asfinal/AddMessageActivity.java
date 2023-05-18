@@ -31,7 +31,7 @@ public class AddMessageActivity extends AppCompatActivity implements UserAdapter
     private SearchView searchView;
     private List<User> userList;
     private UserAdapter adapter;
-    private User userCurrent= new User();
+    private User userCurrent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +46,7 @@ public class AddMessageActivity extends AppCompatActivity implements UserAdapter
         });
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String uidCurrent = mAuth.getCurrentUser().getUid();
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String fullName) {
@@ -60,7 +61,6 @@ public class AddMessageActivity extends AppCompatActivity implements UserAdapter
                     recyclerView.setAdapter(adapter);
                     return false;
                 }
-
                 DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
                 usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -71,20 +71,17 @@ public class AddMessageActivity extends AppCompatActivity implements UserAdapter
                             if (user != null) {
                                 if (user.getFull_name().toLowerCase(Locale.ROOT).contains(newText.toLowerCase()) || user.getEmail().toLowerCase(Locale.ROOT).contains(newText.toLowerCase())) {
                                     String uid = userSnapshot.getKey();
-                                    if(!uidCurrent.equals(uid)){
+                                    if (!uidCurrent.equals(uid)) {
                                         user.setUid(uid);
                                         userList.add(user);
-                                    }else {
-                                        userCurrent = user;
                                     }
                                 }
                             }
+                            adapter.setList(userList);
+                            LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext(), RecyclerView.VERTICAL, false);
+                            recyclerView.setLayoutManager(manager);
+                            recyclerView.setAdapter(adapter);
                         }
-                        // Xử lý danh sách người dùng tại đây
-                        adapter.setList(userList);
-                        LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext(), RecyclerView.VERTICAL, false);
-                        recyclerView.setLayoutManager(manager);
-                        recyclerView.setAdapter(adapter);
                     }
 
                     @Override
@@ -99,6 +96,16 @@ public class AddMessageActivity extends AppCompatActivity implements UserAdapter
     }
 
     private void initView() {
+        userCurrent = new User();
+        Intent intent = getIntent();
+        userCurrent = (User) intent.getSerializableExtra("userCurrent");
+        if (userCurrent != null) {
+        } else {
+            Toast.makeText(this, "Lỗi không nhận được user current", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(AddMessageActivity.this, MainActivity.class));
+            finish();
+        }
+
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Looking for new chats!");
         setSupportActionBar(toolbar);
@@ -122,8 +129,10 @@ public class AddMessageActivity extends AppCompatActivity implements UserAdapter
         Intent intent = new Intent(AddMessageActivity.this, ChatActivity.class);
         intent.putExtra("user2", userList.get(position));
         intent.putExtra("user1", userCurrent);
-//        Toast.makeText(this, "ChatActivity" + userList.get(position).getFull_name(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), userCurrent.getUid() + ":uid1", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), userList.get(position).getUid() + ":uid2", Toast.LENGTH_SHORT).show();
         startActivity(intent);
+        finish();
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.example.asfinal.fragment.ImageFragment;
 import com.example.asfinal.fragment.InforFragment;
 import com.example.asfinal.model.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     public ViewPagerAdapter(@NonNull FragmentManager fm, int behavior, User user) {
         super(fm, behavior);
         this.user = user;
+
     }
 
     @NonNull
@@ -29,6 +31,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 InforFragment inforFragment = new InforFragment();
                 Bundle bundle = new Bundle();
+
                 bundle.putSerializable("user", user);
                 inforFragment.setArguments(bundle);
                 return inforFragment;

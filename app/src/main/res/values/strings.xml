@@ -34,5 +34,6 @@
     <string name="action_options">Options</string>
     <string name="search_hint">Search by name or email</string>
     <string name="action_right_button">button</string>
+    <string name="delete">Delete</string>
 
 </resources>

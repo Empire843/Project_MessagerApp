@@ -6,12 +6,12 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.example.asfinal.R;
@@ -31,6 +31,7 @@ public class ImageFragment extends Fragment {
     private RecyclerView recyclerView;
     private ImageAdapter imageAdapter;
     private List<String> images = new ArrayList<>();
+    private List<String> list = new ArrayList<>();
 
     @Nullable
     @Override
@@ -41,7 +42,6 @@ public class ImageFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "fragment", Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(getContext(), images.size() + "", Toast.LENGTH_SHORT).show();
         return inflater.inflate(R.layout.fragment_image, container, false);
     }
 
@@ -50,42 +50,43 @@ public class ImageFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
         getDataFromFirebaseStorage();
-
-
     }
 
     private void getDataFromFirebaseStorage() {
-        Toast.makeText(getContext(), user.getUid() + "", Toast.LENGTH_SHORT).show();
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference imagesRef = storage.getReference().child("images/" + user.getUid());
-        imagesRef.listAll()
-                .addOnSuccessListener(new OnSuccessListener<ListResult>() {
+        imagesRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
                     @Override
                     public void onSuccess(ListResult listResult) {
-                        List<String> list = new ArrayList<>();
+                        int itemCount = listResult.getItems().size();
                         for (StorageReference item : listResult.getItems()) {
                             item.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     String imageUrl = uri.toString();
                                     list.add(imageUrl);
+//                                    Toast.makeText(getContext(), "list: " + list, Toast.LENGTH_SHORT).show();
+                                    if (list.size() == itemCount) {
+                                        imageAdapter.updateData(list);
+                                        recyclerView.setAdapter(imageAdapter);
+                                    }
                                 }
                             });
                         }
-                        imageAdapter.updateData(list);
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // Xảy ra lỗi khi lấy danh sách tệp tin
+                        Toast.makeText(getContext(), "Lỗi khi lấy tập tin", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
-
     private void initView(View view) {
         recyclerView = view.findViewById(R.id.recyclerView_image);
+        GridLayoutManager manager = new GridLayoutManager(getContext(), 3);
+        recyclerView.setLayoutManager(manager);
         imageAdapter = new ImageAdapter(new ArrayList<>());
         recyclerView.setAdapter(imageAdapter);
     }

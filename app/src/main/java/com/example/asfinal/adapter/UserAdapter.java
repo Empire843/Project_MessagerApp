@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.asfinal.R;
+import com.example.asfinal.model.Message;
 import com.example.asfinal.model.User;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         User result = resultList.get(position);
         holder.resultTextView.setText(result.getFull_name());
         holder.resultTextViewEmail.setText(result.getEmail());
-        if(result.getAvatar() != null){
+        if (result.getAvatar() != null) {
             Glide.with(holder.itemView.getContext())
                     .load(result.getAvatar())
                     .into(holder.imageView);
@@ -59,6 +60,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     @Override
     public int getItemCount() {
         return resultList.size();
+    }
+
+    public void updateData(List<User> newData) {
+        resultList.clear();
+        resultList.addAll(newData);
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

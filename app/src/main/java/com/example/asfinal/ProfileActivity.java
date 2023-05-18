@@ -56,6 +56,7 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         init();
+
         receiveDataFromIntent();
         int colorA = Color.parseColor("#FF0000"); // Màu đỏ
         int colorB = Color.parseColor("#0000FF"); // Màu xanh
@@ -66,12 +67,16 @@ public class ProfileActivity extends AppCompatActivity {
 //        display;
         displayInfor();
         tabLayoutInformation();
+        if (user.getUid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+            editButton.setVisibility(View.VISIBLE);
+        } else {
+            editButton.setVisibility(View.GONE);
+        }
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
                 intent.putExtra("user", user);
-                Toast.makeText(ProfileActivity.this, user.getFull_name(), Toast.LENGTH_SHORT).show();
                 startActivity(intent);
                 finish();
             }

@@ -218,8 +218,6 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
         alertDialog.show();
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        long times = System.currentTimeMillis();
-//        String pathString = "images/" + userCurrent.getUid() + "/" + imageUri.getLastPathSegment();
         StorageReference storageRef = storage.getReference().child("chat").child(userCurrent.getUid()).child(imageUri.getLastPathSegment());
 
         UploadTask uploadTask = storageRef.putFile(imageUri);
@@ -249,7 +247,6 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK && data != null) {
             Uri imageUri = data.getData();
-//            avatar.setImageURI(imageUri);
             uploadImageToStorage(imageUri);
         }
     }

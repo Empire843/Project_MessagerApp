@@ -1,10 +1,11 @@
 package com.example.asfinal.model;
 
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-public class Message {
+public class Message implements Serializable {
     private String id;
     private String senderId;
     //    private String receiverId;

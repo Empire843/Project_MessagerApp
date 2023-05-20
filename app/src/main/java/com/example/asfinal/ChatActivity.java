@@ -24,6 +24,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.SimpleItemAnimator;
@@ -32,8 +34,10 @@ import com.bumptech.glide.Glide;
 import com.example.asfinal.adapter.MessageAdapter;
 import com.example.asfinal.model.Message;
 import com.example.asfinal.model.User;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -45,16 +49,13 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity implements MessageAdapter.MessageListener {
     private final int REQUEST_IMAGE_PICK = 1;
+
     private CircleImageView avatar;
     private RecyclerView recyclerView;
     private EditText editChat;
@@ -126,7 +127,6 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
         recyclerView = findViewById(R.id.recyclerView_chat);
         btnSelectImages = findViewById(R.id.choose_image);
 //        content
-
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         uidCurrent = mAuth.getCurrentUser().getUid();
         database = FirebaseDatabase.getInstance();
@@ -139,27 +139,11 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
         Message message = new Message(senderId, messageContent, images, System.currentTimeMillis());
         DatabaseReference messagesRef = database.getReference("Messages");
         String messageId = messagesRef.child(senderId).child(receiverId).push().getKey();
+        message.setId(messageId);
         messagesRef.child(senderId).child(receiverId).child(messageId).setValue(message);
         messagesRef.child(receiverId).child(senderId).child(messageId).setValue(message);
     }
 
-    //    private void sortListByTimestamp(List<Message> list) {
-//        Collections.sort(list, new Comparator<Message>() {
-//            @Override
-//            public int compare(Message message1, Message message2) {
-//                long timestamp1 = message1.getTimestamp();
-//                long timestamp2 = message2.getTimestamp();
-//
-//                if (timestamp1 > timestamp2) {
-//                    return 1;
-//                } else if (timestamp1 < timestamp2) {
-//                    return -1;
-//                } else {
-//                    return 0;
-//                }
-//            }
-//        });
-//    }
     public void showOptionsMenu(View view) {
         PopupMenu popupMenu = new PopupMenu(this, view);
         popupMenu.getMenuInflater().inflate(R.menu.menu_options, popupMenu.getMenu());
@@ -176,7 +160,6 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
 //                    case R.id.menu_item2:
 //                        // Xử lý cho menu item 2
 //                        return true;
-                    // Thêm các trường hợp xử lý khác (nếu cần)
                     default:
                         return false;
                 }
@@ -184,13 +167,11 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
         });
         popupMenu.show();
     }
-
     @Override
     protected void onStart() {
         super.onStart();
         getDataMessageOnFirebase(uidCurrent, uidReceive);
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -223,7 +204,6 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-
     }
 
     private void chooseImage() {
@@ -233,8 +213,7 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
 
     private void uploadImageToStorage(Uri imageUri) {
         AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this);
-        builder.setView(R.layout.loading_layout)
-                .setCancelable(false);
+        builder.setView(R.layout.loading_layout).setCancelable(false);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
@@ -251,9 +230,8 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
                     @Override
                     public void onSuccess(Uri downloadUrl) {
                         String imageUrl = downloadUrl.toString();
-                        Toast.makeText(ChatActivity.this, imageUrl + "", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(ChatActivity.this, imageUrl + "", Toast.LENGTH_SHORT).show();
                         sendMessage(userCurrent.getUid(), userReceive.getUid(), imageUrl, "");
-                        saveMessageToDatabase(imageUrl);
                         alertDialog.dismiss();
                     }
                 });
@@ -261,40 +239,9 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                // Xử lý khi tải lên thất bại
                 alertDialog.dismiss();
             }
         });
-    }
-
-    private void saveMessageToDatabase(String imageUrl) {
-
-        DatabaseReference messagesRef = database.getReference("Messages");
-        String messageId = messagesRef.child(userCurrent.getUid()).child(userReceive.getUid()).push().getKey();
-        Map<String, Object> updateInfo = new HashMap<>();
-
-        Map<String, Object> updateInfo1 = new HashMap<>();
-        updateInfo1.put("images", imageUrl);
-
-//        messagesRef.child(userCurrent.getUid()).child(userReceive.getUid()).child(messageId).setValue(message);
-        messagesRef.child(userCurrent.getUid()).child(userReceive.getUid()).child(messageId).updateChildren(updateInfo);
-//        messagesRef.child(userReceive.getUid()).child(userCurrent.getUid()).child(messageId).setValue(message);
-        messagesRef.child(userReceive.getUid()).child(userCurrent.getUid()).child(messageId).updateChildren(updateInfo);
-    }
-
-    private void showAlertDialogMenu() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Menu");
-        String[] menuItems = {"Delete", "Copy"}; // Các mục trong menu
-        builder.setItems(menuItems, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Xử lý khi mục trong menu được chọn
-                String selectedItem = menuItems[which];
-                Toast.makeText(getApplicationContext(), "Selected: " + selectedItem, Toast.LENGTH_SHORT).show();
-            }
-        });
-        builder.show(); // Hiển thị dialog menu
     }
 
     @Override
@@ -303,18 +250,8 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
         if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK && data != null) {
             Uri imageUri = data.getData();
 //            avatar.setImageURI(imageUri);
-
             uploadImageToStorage(imageUri);
         }
-    }
-
-    @Override
-    public void onClickMessage(View view, int position) {
-        if (messageList.get(position).getImages() != null ) {
-            Context context = view.getContext();
-            showImageDialog(context, messageList.get(position).getImages());
-        }
-
     }
 
     private void showImageDialog(Context context, String imageUrl) {
@@ -330,8 +267,64 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
     }
 
     @Override
+    public void onClickMessage(View view, int position) {
+        if (messageList.get(position).getImages() != null) {
+            Context context = view.getContext();
+            showImageDialog(context, messageList.get(position).getImages());
+        }
+    }
+
+    private void showAlertDialogMenu(int position) {
+        Message message = messageList.get(position);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String[] menuItems = {"Delete", "Unsend", "Copy"};
+        builder.setItems(menuItems, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String selectedItem = menuItems[which];
+                if (selectedItem.equals("Delete")) {
+                    deleteItemMessage(message);
+                } else if (selectedItem.equals("Copy")) {
+                    copyTextToClipboard(message.getContent());
+                } else if (selectedItem.equals("Unsend")) {
+                    unSendItemMessage(message);
+                }
+            }
+        });
+        builder.show();
+    }
+
+    private void deleteItemMessage(Message message) {
+        DatabaseReference messagesRef = database.getReference("Messages");
+        messagesRef.child(userCurrent.getUid()).child(userReceive.getUid()).child(message.getId()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), "Message has been deleted.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Failed message deletion." + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void unSendItemMessage(Message message) {
+        if (userCurrent.getUid().equals(message.getSenderId())) {
+            DatabaseReference messagesRef = database.getReference("Messages");
+            messagesRef.child(userCurrent.getUid()).child(userReceive.getUid()).child(message.getId()).removeValue();
+            messagesRef.child(userReceive.getUid()).child(userCurrent.getUid()).child(message.getId()).removeValue();
+            Toast.makeText(this, "Unsend successfully", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "You can't unsend this message", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void copyTextToClipboard(String text) {
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText("Copied Text", text);
+        clipboardManager.setPrimaryClip(clipData);
+    }
+    @Override
     public void onLongClickMessage(View view, int position) {
-        Toast.makeText(this, "Click Long", Toast.LENGTH_SHORT).show();
-        showAlertDialogMenu();
+        showAlertDialogMenu(position);
     }
 }

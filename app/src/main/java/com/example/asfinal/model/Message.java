@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class Message {
+    private String id;
     private String senderId;
     //    private String receiverId;
     private String content;
@@ -21,6 +22,14 @@ public class Message {
         this.images = images;
         this.content = content;
         this.timestamp = timestamp;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getSenderId() {
@@ -54,6 +63,7 @@ public class Message {
     public void setImages(String images) {
         this.images = images;
     }
+
 }
 
 

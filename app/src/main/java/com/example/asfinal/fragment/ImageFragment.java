@@ -1,5 +1,9 @@
 package com.example.asfinal.fragment;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -12,8 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.asfinal.R;
 import com.example.asfinal.adapter.ImageAdapter;
 import com.example.asfinal.model.User;
@@ -26,7 +32,7 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImageFragment extends Fragment {
+public class ImageFragment extends Fragment implements ImageAdapter.ImageListener {
     private User user = new User();
     private RecyclerView recyclerView;
     private ImageAdapter imageAdapter;
@@ -43,6 +49,7 @@ public class ImageFragment extends Fragment {
             Toast.makeText(getContext(), "fragment", Toast.LENGTH_SHORT).show();
         }
         return inflater.inflate(R.layout.fragment_image, container, false);
+
     }
 
     @Override
@@ -50,6 +57,7 @@ public class ImageFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
         getDataFromFirebaseStorage();
+
     }
 
     private void getDataFromFirebaseStorage() {
@@ -83,11 +91,31 @@ public class ImageFragment extends Fragment {
                     }
                 });
     }
+
     private void initView(View view) {
         recyclerView = view.findViewById(R.id.recyclerView_image);
         GridLayoutManager manager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(manager);
         imageAdapter = new ImageAdapter(new ArrayList<>());
         recyclerView.setAdapter(imageAdapter);
+
+    }
+
+    @Override
+    public void onClickImage(View view, int position) {
+        Toast.makeText(view.getContext(), "t", Toast.LENGTH_SHORT).show();
+        showImageDialog(view.getContext(), list.get(position));
+    }
+
+    private void showImageDialog(Context context, String imageUrl) {
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_image_view);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        ImageView imageView = dialog.findViewById(R.id.imageView);
+        Glide.with(getContext())
+                .load(imageUrl)
+//                .placeholder(R.drawable.ic_user)
+                .into(imageView);
+        dialog.show();
     }
 }

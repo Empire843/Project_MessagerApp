@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- dialog_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#80000000" /> <!-- Mã màu #80000000 tương ứng với màu đen có độ trong suốt -->
+    <corners android:radius="8dp" /> <!-- Định nghĩa góc bo tròn -->
+</shape>

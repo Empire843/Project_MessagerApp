@@ -68,10 +68,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         setContentView(R.layout.activity_main);
         init();
 
-        toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView = findViewById(R.id.nav_view);
+
 
         getConversationFromFirebase();
         adapter.setConversationListener(this);
@@ -140,6 +137,10 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
 
         drawer = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+        toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+//        navigationView = findViewById(R.id.nav_view);
         recyclerView = findViewById(R.id.recycler_view_main);
         fab = findViewById(R.id.fab);
         userList = new ArrayList<>();
@@ -207,14 +208,12 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                     });
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 loadingBar.dismiss();
             }
         });
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -248,9 +247,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                                 .into(profileImageView);
                     }
                 }
-
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }

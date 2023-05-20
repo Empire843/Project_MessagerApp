@@ -21,7 +21,6 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     public ViewPagerAdapter(@NonNull FragmentManager fm, int behavior, User user) {
         super(fm, behavior);
         this.user = user;
-
     }
 
     @NonNull
@@ -44,7 +43,6 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         }
         return new InforFragment();
     }
-
     @Override
     public int getCount() {
         return 2;

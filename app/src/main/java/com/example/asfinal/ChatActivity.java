@@ -8,9 +8,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -24,6 +28,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
+import com.bumptech.glide.Glide;
 import com.example.asfinal.adapter.MessageAdapter;
 import com.example.asfinal.model.Message;
 import com.example.asfinal.model.User;
@@ -203,7 +208,7 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
                     textList.add(message.getContent());
                 }
 //                MessageAdapter adapter = new MessageAdapter(messageList, uidCurrent, userCurrent.getAvatar(), userReceive.getAvatar());
-                adapter.setMessageList(messageList, uidCurrent, userCurrent.getAvatar(), userReceive.getAvatar());
+                adapter.setMessageList(getApplicationContext(), messageList, uidCurrent, userCurrent.getAvatar(), userReceive.getAvatar());
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(ChatActivity.this));
                 recyclerView.scrollToPosition(messageList.size() - 1);
@@ -289,7 +294,6 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
                 Toast.makeText(getApplicationContext(), "Selected: " + selectedItem, Toast.LENGTH_SHORT).show();
             }
         });
-
         builder.show(); // Hiển thị dialog menu
     }
 
@@ -306,13 +310,28 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
 
     @Override
     public void onClickMessage(View view, int position) {
-//        Toast.makeText(this, "Click Short", Toast.LENGTH_SHORT).show();
+        if (messageList.get(position).getImages() != null ) {
+            Context context = view.getContext();
+            showImageDialog(context, messageList.get(position).getImages());
+        }
+
+    }
+
+    private void showImageDialog(Context context, String imageUrl) {
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_image_view);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        ImageView imageView = dialog.findViewById(R.id.imageView);
+        Glide.with(getApplicationContext())
+                .load(imageUrl)
+//                .placeholder(R.drawable.ic_user)
+                .into(imageView);
+        dialog.show();
     }
 
     @Override
     public void onLongClickMessage(View view, int position) {
         Toast.makeText(this, "Click Long", Toast.LENGTH_SHORT).show();
         showAlertDialogMenu();
-
     }
 }

@@ -3,8 +3,11 @@ package com.example.asfinal;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -102,13 +105,31 @@ public class ProfileActivity extends AppCompatActivity {
         txtEmail.setText("Email: " + user.getEmail());
         txtAddress.setText("Address: " + user.getAddress());
         txtPhone.setText("Phone Number: " + user.getPhone_number());
+        CircleImageView profileImageView = findViewById(R.id.user_avatar);
         if (user.getAvatar() != null) {
-            CircleImageView profileImageView = findViewById(R.id.user_avatar);
             Glide.with(ProfileActivity.this)
                     .load(user.getAvatar())
                     .placeholder(R.drawable.loading_image)
                     .into(profileImageView);
         }
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showImageDialog(ProfileActivity.this, user.getAvatar());
+            }
+        });
+    }
+
+    private void showImageDialog(Context context, String imageUrl) {
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_image_view);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        ImageView imageView = dialog.findViewById(R.id.imageView);
+        Glide.with(getApplicationContext())
+                .load(imageUrl)
+//                .placeholder(R.drawable.ic_user)
+                .into(imageView);
+        dialog.show();
     }
 
     private void tabLayoutInformation() {

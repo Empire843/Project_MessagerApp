@@ -1,5 +1,6 @@
 package com.example.asfinal.adapter;
 
+import android.content.Context;
 import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private String uidCurrent;
 
     private MessageListener messageListener;
+    private Context context;
 
     public void setMessageListener(MessageAdapter.MessageListener messageListener) {
         this.messageListener = messageListener;
@@ -47,8 +49,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         notifyDataSetChanged();
     }
 
-    public void setMessageList(List<Message> messageList, String uidCurrent, String imageUrl_sender, String imageUrl_receiver) {
+    public void setMessageList(Context context, List<Message> messageList, String uidCurrent, String imageUrl_sender, String imageUrl_receiver) {
         this.messageList = messageList;
+        this.context = context;
         this.uidCurrent = uidCurrent;
         this.imageUrl_sender = imageUrl_sender;
         this.imageUrl_receiver = imageUrl_receiver;

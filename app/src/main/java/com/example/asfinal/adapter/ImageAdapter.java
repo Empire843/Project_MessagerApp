@@ -15,10 +15,16 @@ import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
     private List<String> imageList;
+    private ImageListener imageListener;
+
+    public void setImageListener(ImageAdapter.ImageListener imageListener) {
+        this.imageListener = imageListener;
+        notifyDataSetChanged();
+    }
 
     public ImageAdapter(List<String> imageList) {
         this.imageList = imageList;
-
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -47,12 +53,23 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         notifyDataSetChanged();
     }
 
-    public class ImageViewHolder extends RecyclerView.ViewHolder {
+    public class ImageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageView;
 
         public ImageViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView_item_image_archive);
         }
+
+        @Override
+        public void onClick(View view) {
+            if (imageListener != null) {
+                imageListener.onClickImage(view, getAdapterPosition());
+            }
+        }
+    }
+
+    public interface ImageListener {
+        void onClickImage(View view, int position);
     }
 }

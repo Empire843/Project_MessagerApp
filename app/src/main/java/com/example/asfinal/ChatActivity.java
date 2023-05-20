@@ -49,28 +49,23 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity implements MessageAdapter.MessageListener {
     private final int REQUEST_IMAGE_PICK = 1;
-
-    private CircleImageView avatar;
     private RecyclerView recyclerView;
     private EditText editChat;
     private ImageView sendButton;
     private ImageView btnSelectImages;
     private User userReceive = new User();
     private User userCurrent = new User();
-
     private List<Message> messageList = new ArrayList<>();
     private List<String> textList = new ArrayList<>();
     private Toolbar toolbar;
     private String uidCurrent;
     private String uidReceive;
     private FirebaseDatabase database;
-    private ProgressDialog loadingBar;
     private MessageAdapter adapter;
 
     @Override
@@ -108,7 +103,6 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
         userReceive = (User) intent.getSerializableExtra("user2");
         userCurrent = (User) intent.getSerializableExtra("user1");
         if (userReceive != null) {
-            // Sử dụng đối tượng User nhận được
             uidReceive = userReceive.getUid();
         } else {
             uidReceive = null;
@@ -158,7 +152,6 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
                         startActivity(intent);
                         return true;
 //                    case R.id.menu_item2:
-//                        // Xử lý cho menu item 2
 //                        return true;
                     default:
                         return false;
@@ -167,11 +160,13 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
         });
         popupMenu.show();
     }
+
     @Override
     protected void onStart() {
         super.onStart();
         getDataMessageOnFirebase(uidCurrent, uidReceive);
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -188,7 +183,6 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
                     messageList.add(message);
                     textList.add(message.getContent());
                 }
-//                MessageAdapter adapter = new MessageAdapter(messageList, uidCurrent, userCurrent.getAvatar(), userReceive.getAvatar());
                 adapter.setMessageList(getApplicationContext(), messageList, uidCurrent, userCurrent.getAvatar(), userReceive.getAvatar());
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(ChatActivity.this));
@@ -306,20 +300,28 @@ public class ChatActivity extends AppCompatActivity implements MessageAdapter.Me
     }
 
     private void unSendItemMessage(Message message) {
-        if (userCurrent.getUid().equals(message.getSenderId())) {
+        long timestamp = message.getTimestamp();
+        Date messageTime = new Date(timestamp);
+        long timeDifferenceMillis = System.currentTimeMillis() - messageTime.getTime();
+        long timeDifferenceHours = timeDifferenceMillis / (60 * 60 * 1000);
+        if (timeDifferenceHours >= 1) {
+            Toast.makeText(this, "This message was sent over an hour ago!", Toast.LENGTH_SHORT).show();
+        } else if (userCurrent.getUid().equals(message.getSenderId())) {
             DatabaseReference messagesRef = database.getReference("Messages");
             messagesRef.child(userCurrent.getUid()).child(userReceive.getUid()).child(message.getId()).removeValue();
             messagesRef.child(userReceive.getUid()).child(userCurrent.getUid()).child(message.getId()).removeValue();
             Toast.makeText(this, "Unsend successfully", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "You can't unsend this message", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You can't unsend this message!", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void copyTextToClipboard(String text) {
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("Copied Text", text);
         clipboardManager.setPrimaryClip(clipData);
     }
+
     @Override
     public void onLongClickMessage(View view, int position) {
         showAlertDialogMenu(position);
